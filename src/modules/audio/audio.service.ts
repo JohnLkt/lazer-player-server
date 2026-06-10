@@ -1,15 +1,11 @@
-// src/modules/audio/audio.service.ts
 import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { createReadStream, existsSync, statSync } from 'fs';
-import { FileService } from 'src/modules/storage/file.service'; // Adjust path based on your layout
+import { FileService } from 'src/modules/storage/file.service';
 
 @Injectable()
 export class AudioService {
   constructor(private readonly fileService: FileService) {}
 
-  /**
-   * Resolves the physical path via FileService and initializes an audio file stream.
-   */
   getAudioStream(hash: string): { stream: any; length: number } {
     if (!hash || hash.length < 3) {
       throw new NotFoundException('Invalid or missing file hash.');

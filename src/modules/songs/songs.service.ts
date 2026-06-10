@@ -71,7 +71,9 @@ export class SongsService {
         artist: beatmap?.Artist ?? 'Unknown Artist',
         artistUnicode: beatmap?.ArtistUnicode ?? beatmap?.Artist ?? 'Unknown Artist',
         audioFileHash: audioFileUsage?.File?.Hash ?? null,
+        audioFileName: audioFileUsage?.Filename ?? null,
         backgroundFileHash: backgroundFileUsage?.File?.Hash ?? null,
+        backgroundFileName: backgroundFileUsage?.Filename ?? null,
         dateAdded: set.DateAdded ? new Date(set.DateAdded) : new Date(),
       };
     });
