@@ -17,13 +17,11 @@ export class SongsService {
   getSongsList(options: GetSongsOptions): SongListItemDto[] {
     const { page, size, search } = options;
 
-    const startTime = performance.now();
-    this.logger.log(`Fetching songs list - Page: ${page}, Size: ${size}, Search Keyword: "${search ?? ''}"`);
-
     const realm = this.databaseService.instance;
 
-    let beatmapSets = realm.objects<BeatmapSet>(BeatmapSet);
+    const queryStartTime = performance.now();
 
+    let beatmapSets = realm.objects<BeatmapSet>(BeatmapSet);
     let query = 'DeletePending == false';
     const queryArgs: any[] = [];
 
@@ -45,8 +43,8 @@ export class SongsService {
     const end = start + size;
     const paginatedSets = filteredSets.slice(start, end);
 
-    const endTime = performance.now();
-    this.logger.debug(`Query completed. Total matched records in DB: ${filteredSets.length}. Slicing indices: [${start} - ${end}] (Duration: ${endTime - startTime} ms)`);
+    const queryEndTime = performance.now();
+    this.logger.debug(`Query completed. Total matched records in DB: ${filteredSets.length}. Slicing indices: [${start} - ${end}] (Duration: ${queryEndTime - queryStartTime} ms)`);
 
     const mappedResults = paginatedSets.map((set): SongListItemDto => {
       const beatmap = set.Beatmaps?.[0]?.Metadata;
@@ -77,9 +75,6 @@ export class SongsService {
         dateAdded: set.DateAdded ? new Date(set.DateAdded) : new Date(),
       };
     });
-
-    const duration = (performance.now() - startTime).toFixed(2);
-    this.logger.log(`Successfully mapped and served ${mappedResults.length} song objects. Execution duration: ${duration}ms`);
 
     return mappedResults;
   }
