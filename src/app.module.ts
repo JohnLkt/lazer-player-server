@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import storageConfig from './config/storage.config';
 import { StorageModule } from './modules/storage/storage.module';
 import { SongsModule } from './modules/songs/songs.module';
+import { AudioModule } from './modules/audio/audio.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { SongsModule } from './modules/songs/songs.module';
     }),
     StorageModule,
     SongsModule,
+    AudioModule,
   ],
 })
 export class AppModule {}
