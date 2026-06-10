@@ -4,6 +4,7 @@ import storageConfig from './config/storage.config';
 import { StorageModule } from './modules/storage/storage.module';
 import { SongsModule } from './modules/songs/songs.module';
 import { AudioModule } from './modules/audio/audio.module';
+import { ImageModule } from './modules/image/image.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AudioModule } from './modules/audio/audio.module';
     StorageModule,
     SongsModule,
     AudioModule,
+    ImageModule,
   ],
 })
 export class AppModule {}
