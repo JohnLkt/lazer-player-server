@@ -1,4 +1,4 @@
-import { Controller, Get, Param, StreamableFile, Header } from '@nestjs/common';
+import { Controller, Get, Param, Query, StreamableFile, Header } from '@nestjs/common';
 import { ImageService } from './image.service';
 
 @Controller('image')
@@ -14,6 +14,23 @@ export class ImageController {
 
     return new StreamableFile(stream, {
       type: 'image/jpeg',
+    });
+  }
+
+  @Get(':hash/optimized')
+  @Header('Cache-Control', 'public, max-age=31536000')
+  async getOptimizedImage(
+    @Param('hash') hash: string,
+    @Query('width') width?: string,
+    @Query('height') height?: string
+  ): Promise<StreamableFile> {
+    const widthNum = width ? parseInt(width, 10) : 200;
+    const heightNum = height ? parseInt(height, 10) : 200;
+
+    const stream = await this.imageService.getOptimizedImage(hash, widthNum, heightNum);
+
+    return new StreamableFile(stream, {
+      type: 'image/webp',
     });
   }
 }
