@@ -41,23 +41,25 @@ osu!lazer stores beatmaps and media in a localized Realm database and a hashed s
 
 Copy the sample configuration file and update the path to your osu!lazer data directory:
 
-\`\`\`bash
+```
+bash
 cp .env.example .env
-\`\`\`
+```
 
 Edit `.env`:
 
-\`\`\`ini
+```
 PORT=8080
 OSU_DATA_PATH=/path/to/your/osu/folder
-\`\`\`
+```
 
 ### 3. Run the Server
 
-\`\`\`bash
+```
+bash
 npm install
 npm start
-\`\`\`
+```
 
 ---
 
