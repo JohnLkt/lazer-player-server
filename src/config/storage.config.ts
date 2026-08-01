@@ -11,7 +11,7 @@ export default registerAs('storage', () => {
   return {
     // Path to the actual Realm database file
     realmDbPath: path.join(basePath, 'client.realm'),
-    
+
     // Path to the hashed files directory
     filesPath: path.join(basePath, 'files'),
   };

@@ -5,12 +5,12 @@ import { StorageConfigService } from 'src/config/storage-config.service';
 @Injectable()
 export class FileService {
   constructor(private storageConfigService: StorageConfigService) {}
-  
+
   private readonly logger = new Logger(FileService.name);
 
   resolveHashPath(hash: string): string {
     const filesDir = this.storageConfigService.filesPath;
-    
+
     // osu!lazer structure: files/firstChar/firstTwoChars/hash
     const firstChar = hash.charAt(0);
     const firstTwoChars = hash.substring(0, 2);

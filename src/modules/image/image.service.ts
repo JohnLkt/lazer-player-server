@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { createReadStream, existsSync } from 'fs';
 import { FileService } from 'src/modules/storage/file.service';
 import { Readable } from 'stream';
@@ -16,21 +20,25 @@ export class ImageService {
     const absoluteFilePath = this.fileService.resolveHashPath(hash);
 
     if (!existsSync(absoluteFilePath)) {
-      throw new NotFoundException(`Image asset file not found for hash: ${hash}`);
+      throw new NotFoundException(
+        `Image asset file not found for hash: ${hash}`,
+      );
     }
 
     try {
       return createReadStream(absoluteFilePath);
-    } catch (err) {
-      throw new InternalServerErrorException('Failed to initialize image file read stream.');
+    } catch {
+      throw new InternalServerErrorException(
+        'Failed to initialize image file read stream.',
+      );
     }
   }
 
-  async getOptimizedImage(
+  getOptimizedImage(
     hash: string,
     widthNum: number,
-    heightNum: number
-  ): Promise<Readable> {
+    heightNum: number,
+  ): Readable {
     if (!hash || hash.length < 3) {
       throw new NotFoundException('Invalid or missing image file hash.');
     }
@@ -38,16 +46,23 @@ export class ImageService {
     const absoluteFilePath = this.fileService.resolveHashPath(hash);
 
     if (!existsSync(absoluteFilePath)) {
-      throw new NotFoundException(`Image asset file not found for hash: ${hash}`);
+      throw new NotFoundException(
+        `Image asset file not found for hash: ${hash}`,
+      );
     }
 
     try {
       const transformer = sharp(absoluteFilePath).webp({ quality: 80 });
-      transformer.resize(widthNum, heightNum, { fit: 'cover', position: 'center' });
+      transformer.resize(widthNum, heightNum, {
+        fit: 'cover',
+        position: 'center',
+      });
 
       return transformer;
-    } catch (err) {
-      throw new InternalServerErrorException('Failed to process optimized image.');
+    } catch {
+      throw new InternalServerErrorException(
+        'Failed to process optimized image.',
+      );
     }
   }
 }

@@ -221,7 +221,7 @@ export class BeatmapSet extends Realm.Object<BeatmapSet> {
       OnlineID: { type: 'int', indexed: true },
       Status: 'int',
       DateSubmitted: 'date?',
-      DateRanked: 'date?'
+      DateRanked: 'date?',
     },
   };
 }
@@ -238,7 +238,7 @@ export class BeatmapCollection extends Realm.Object<BeatmapCollection> {
     properties: {
       ID: 'uuid',
       Name: 'string?',
-      BeatmapMD5Hashes: {type: 'list', objectType: 'string', optional: true},
+      BeatmapMD5Hashes: { type: 'list', objectType: 'string', optional: true },
       LastModified: 'date',
     },
   };
@@ -404,7 +404,7 @@ export const realmSchema = [
   BeatmapDifficulty,
   BeatmapUserSettings,
   RealmNamedFileUsage,
-  BeatmapMetadata, 
+  BeatmapMetadata,
   Beatmap,
   BeatmapSet,
   BeatmapCollection,

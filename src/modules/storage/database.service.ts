@@ -1,4 +1,9 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { existsSync } from 'fs';
 import Realm from 'realm';
 import { StorageConfigService } from 'src/config/storage-config.service';
@@ -37,7 +42,9 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   get instance(): Realm {
     if (!this.realm || this.realm.isClosed) {
-      throw new Error('Database error: Realm instance is closed or uninitialized.');
+      throw new Error(
+        'Database error: Realm instance is closed or uninitialized.',
+      );
     }
     return this.realm;
   }

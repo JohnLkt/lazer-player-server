@@ -1,12 +1,21 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { createReadStream, existsSync, statSync } from 'fs';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { createReadStream, existsSync, statSync, ReadStream } from 'fs';
 import { FileService } from 'src/modules/storage/file.service';
+
+export interface AudioStreamResult {
+  stream: ReadStream;
+  length: number;
+}
 
 @Injectable()
 export class AudioService {
   constructor(private readonly fileService: FileService) {}
 
-  getAudioStream(hash: string): { stream: any; length: number } {
+  getAudioStream(hash: string): AudioStreamResult {
     if (!hash || hash.length < 3) {
       throw new NotFoundException('Invalid or missing file hash.');
     }
@@ -14,7 +23,9 @@ export class AudioService {
     const absoluteFilePath = this.fileService.resolveHashPath(hash);
 
     if (!existsSync(absoluteFilePath)) {
-      throw new NotFoundException(`Audio file asset not found for hash: ${hash}`);
+      throw new NotFoundException(
+        `Audio file asset not found for hash: ${hash}`,
+      );
     }
 
     try {
@@ -23,8 +34,10 @@ export class AudioService {
       const stream = createReadStream(absoluteFilePath);
 
       return { stream, length: size };
-    } catch (err) {
-      throw new InternalServerErrorException('Failed to initialize asset file stream buffer.');
+    } catch {
+      throw new InternalServerErrorException(
+        'Failed to initialize asset file stream buffer.',
+      );
     }
   }
 }

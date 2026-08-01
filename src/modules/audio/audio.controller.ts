@@ -7,14 +7,12 @@ export class AudioController {
 
   @Get(':hash')
   @Header('Accept-Ranges', 'bytes')
-  getAudio(
-    @Param('hash') hash: string
-  ): StreamableFile {
+  getAudio(@Param('hash') hash: string): StreamableFile {
     const { stream, length } = this.audioService.getAudioStream(hash);
 
     return new StreamableFile(stream, {
       type: 'audio/mpeg',
-      length: length
+      length: length,
     });
   }
 }

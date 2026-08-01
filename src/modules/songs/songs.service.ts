@@ -21,9 +21,10 @@ export class SongsService {
 
     const queryStartTime = performance.now();
 
-    let beatmapSets = realm.objects<BeatmapSet>(BeatmapSet);
+    const beatmapSets = realm.objects<BeatmapSet>(BeatmapSet);
     let query = 'DeletePending == false';
-    const queryArgs: any[] = [];
+
+    const queryArgs: (string | number | boolean)[] = [];
 
     // Filters down nested metadata objects inside osu!lazer schema configurations
     if (search) {
@@ -37,14 +38,16 @@ export class SongsService {
       queryArgs.push(search);
     }
 
-    let filteredSets = beatmapSets.filtered(query, ...queryArgs);
+    const filteredSets = beatmapSets.filtered(query, ...queryArgs);
 
     const start = (page - 1) * size;
     const end = start + size;
     const paginatedSets = filteredSets.slice(start, end);
 
     const queryEndTime = performance.now();
-    this.logger.debug(`Query completed. Total matched records in DB: ${filteredSets.length}. Slicing indices: [${start} - ${end}] (Duration: ${queryEndTime - queryStartTime} ms)`);
+    this.logger.debug(
+      `Query completed. Total matched records in DB: ${filteredSets.length}. Slicing indices: [${start} - ${end}] (Duration: ${queryEndTime - queryStartTime} ms)`,
+    );
 
     const mappedResults = paginatedSets.map((set): SongListItemDto => {
       const beatmap = set.Beatmaps?.[0]?.Metadata;
@@ -53,23 +56,32 @@ export class SongsService {
 
       // Case-insensitive lookups safeguard asset tracking loops
       const audioFileUsage = audioFileName
-        ? set.Files?.find((f) => f.Filename?.toLowerCase() === audioFileName.toLowerCase())
+        ? set.Files?.find(
+            (f) => f.Filename?.toLowerCase() === audioFileName.toLowerCase(),
+          )
         : null;
 
       const backgroundFileUsage = backgroundFileName
-        ? set.Files?.find((f) => f.Filename?.toLowerCase() === backgroundFileName.toLowerCase())
+        ? set.Files?.find(
+            (f) =>
+              f.Filename?.toLowerCase() === backgroundFileName.toLowerCase(),
+          )
         : null;
 
       if (!audioFileUsage && audioFileName) {
-        this.logger.warn(`Audio file mapping missing for set ID: ${set.ID?.toString()} (Expected: "${audioFileName}")`);
+        this.logger.warn(
+          `Audio file mapping missing for set ID: ${set.ID?.toString()} (Expected: "${audioFileName}")`,
+        );
       }
 
       return {
         id: set.ID?.toString() ?? '',
         title: beatmap?.Title ?? 'Unknown Title',
-        titleUnicode: beatmap?.TitleUnicode ?? beatmap?.Title ?? 'Unknown Title',
+        titleUnicode:
+          beatmap?.TitleUnicode ?? beatmap?.Title ?? 'Unknown Title',
         artist: beatmap?.Artist ?? 'Unknown Artist',
-        artistUnicode: beatmap?.ArtistUnicode ?? beatmap?.Artist ?? 'Unknown Artist',
+        artistUnicode:
+          beatmap?.ArtistUnicode ?? beatmap?.Artist ?? 'Unknown Artist',
         audioFileHash: audioFileUsage?.File?.Hash ?? null,
         audioFileName: audioFileUsage?.Filename ?? null,
         backgroundFileHash: backgroundFileUsage?.File?.Hash ?? null,

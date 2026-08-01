@@ -9,5 +9,4 @@ import { StorageConfigService } from 'src/config/storage-config.service';
   providers: [StorageConfigService, DatabaseService, FileService],
   exports: [StorageConfigService, DatabaseService, FileService],
 })
-
 export class StorageModule {}
