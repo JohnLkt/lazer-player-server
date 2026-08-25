@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { createReadStream, existsSync } from 'fs';
 import { FileService } from 'src/modules/storage/file.service';
 import { Readable } from 'stream';
@@ -25,13 +21,7 @@ export class ImageService {
       );
     }
 
-    try {
-      return createReadStream(absoluteFilePath);
-    } catch {
-      throw new InternalServerErrorException(
-        'Failed to initialize image file read stream.',
-      );
-    }
+    return createReadStream(absoluteFilePath);
   }
 
   getOptimizedImage(
@@ -51,18 +41,12 @@ export class ImageService {
       );
     }
 
-    try {
-      const transformer = sharp(absoluteFilePath).webp({ quality: 80 });
-      transformer.resize(widthNum, heightNum, {
-        fit: 'cover',
-        position: 'center',
-      });
+    const transformer = sharp(absoluteFilePath).webp({ quality: 80 });
+    transformer.resize(widthNum, heightNum, {
+      fit: 'cover',
+      position: 'center',
+    });
 
-      return transformer;
-    } catch {
-      throw new InternalServerErrorException(
-        'Failed to process optimized image.',
-      );
-    }
+    return transformer;
   }
 }

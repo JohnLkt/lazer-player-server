@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { existsSync } from 'fs';
 import Realm from 'realm';
-import { StorageConfigService } from 'src/config/storage-config.service';
+import { StorageConfigService } from '../../config/storage-config.service';
 import { realmSchema } from './models/database.model';
 
 @Injectable()

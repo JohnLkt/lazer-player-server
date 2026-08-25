@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { AudioService } from './audio.service';
+import { buildStreamableFile } from '../../common/streamable-file';
 
 @Controller('audio')
 export class AudioController {
@@ -22,17 +23,21 @@ export class AudioController {
     @Headers('range') range: string | undefined,
     @Res({ passthrough: true }) res: Response,
   ): StreamableFile {
-    const { stream, start, end, total, partial } =
-      this.audioService.getAudioStream(hash, range);
+    const { stream, metadata } = this.audioService.getAudioStream(hash, range);
 
-    if (partial) {
+    if (metadata.partial) {
       res.status(HttpStatus.PARTIAL_CONTENT);
-      res.setHeader('Content-Range', `bytes ${start}-${end}/${total}`);
+      res.setHeader(
+        'Content-Range',
+        `bytes ${metadata.start}-${metadata.end}/${metadata.total}`,
+      );
     }
 
-    return new StreamableFile(stream, {
+    return buildStreamableFile(stream, {
       type: 'audio/mpeg',
-      length: partial ? end - start + 1 : total,
+      length: metadata.partial
+        ? metadata.end - metadata.start + 1
+        : metadata.total,
     });
   }
 }

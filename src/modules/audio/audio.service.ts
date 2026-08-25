@@ -6,33 +6,31 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { createReadStream, existsSync, statSync, ReadStream } from 'fs';
-import { FileService } from 'src/modules/storage/file.service';
+import { parseByteRange } from '../../common/byte-range';
+import { validateHash } from '../../common/validate-hash';
+import { FileService } from '../storage/file.service';
 
-export interface AudioStreamResult {
-  stream: ReadStream;
+export interface AudioStreamMetadata {
   /** First byte of the stream (0 for full responses). */
   start: number;
   /** Last byte of the stream (total - 1 for full responses). */
   end: number;
   total: number;
+  /** Whether the stream was a partial (ranged) response. */
   partial: boolean;
-}
-
-interface ByteRange {
-  start: number;
-  end: number;
 }
 
 @Injectable()
 export class AudioService {
   constructor(private readonly fileService: FileService) {}
 
-  getAudioStream(hash: string, rangeHeader?: string): AudioStreamResult {
-    if (!hash || hash.length < 3) {
-      throw new NotFoundException('Invalid or missing file hash.');
-    }
+  getAudioStream(
+    hash: string,
+    rangeHeader?: string,
+  ): { stream: ReadStream; metadata: AudioStreamMetadata } {
+    const validatedHash = validateHash(hash);
 
-    const absoluteFilePath = this.fileService.resolveHashPath(hash);
+    const absoluteFilePath = this.fileService.resolveHashPath(validatedHash);
 
     if (!existsSync(absoluteFilePath)) {
       throw new NotFoundException(
@@ -57,7 +55,10 @@ export class AudioService {
 
       const stream = createReadStream(absoluteFilePath, { start, end });
 
-      return { stream, start, end, total: size, partial: range !== null };
+      return {
+        stream,
+        metadata: { start, end, total: size, partial: range !== null },
+      };
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -67,40 +68,4 @@ export class AudioService {
       );
     }
   }
-}
-
-/**
- * Parses a single-range `Range` header against a resource of `size` bytes.
- * Returns `{ start, end }` for a satisfiable range, `'unsatisfiable'` when
- * the request can never be satisfied (416), and `null` when the header is
- * absent, malformed, or uses unsupported syntax (serve the full body).
- */
-function parseByteRange(
-  header: string,
-  size: number,
-): ByteRange | 'unsatisfiable' | null {
-  const match = /^bytes=(\d*)-(\d*)$/.exec(header.trim());
-  if (!match) return null;
-
-  const [, rawStart, rawEnd] = match;
-  if (rawStart === '' && rawEnd === '') return null;
-
-  let start: number;
-  let end: number;
-
-  if (rawStart === '') {
-    // Suffix form: bytes=-N (the final N bytes).
-    const suffixLength = Number(rawEnd);
-    if (suffixLength <= 0 || size === 0) return 'unsatisfiable';
-    start = Math.max(0, size - suffixLength);
-    end = size - 1;
-  } else {
-    start = Number(rawStart);
-    end = rawEnd === '' ? size - 1 : Math.min(Number(rawEnd), size - 1);
-  }
-
-  if (start >= size) return 'unsatisfiable';
-  if (start > end) return null;
-
-  return { start, end };
 }

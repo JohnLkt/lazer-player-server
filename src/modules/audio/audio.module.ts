@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AudioService } from './audio.service';
 import { AudioController } from './audio.controller';
-import { StorageModule } from 'src/modules/storage/storage.module';
+import { StorageModule } from '../storage/storage.module';
 
 @Module({
   imports: [StorageModule],
