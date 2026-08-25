@@ -14,4 +14,3 @@ export class ImageQueryDto {
   @Type(() => Number)
   height: number = 200;
 }
-

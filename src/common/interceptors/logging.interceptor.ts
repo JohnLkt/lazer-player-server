@@ -19,7 +19,7 @@ export class LoggingInterceptor implements NestInterceptor {
     const response = ctx.getResponse<Response>();
     const method = request.method;
     const url = request.url;
-    const requestId = request.headers['x-request-id'] ?? '';
+    const requestId = String(request.headers['x-request-id']);
     const startTime = performance.now();
 
     this.logger.log(`[${method}] ${url} - ${requestId} - Start`);
