@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as path from 'path';
-import { StorageConfigService } from 'src/config/storage-config.service';
+import { StorageConfigService } from '../../config/storage-config.service';
 
 @Injectable()
 export class FileService {
